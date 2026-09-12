@@ -1,0 +1,228 @@
+#ifndef MESH_H
+#define MESH_H
+
+#include <glad/glad.h> // holds all OpenGL type declarations
+
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+
+#include "shader.h"
+
+#include <string>
+#include <vector>
+using namespace std;
+namespace OpenGL {
+
+#define MAX_BONE_INFLUENCE 4
+
+    struct Vertex {
+        // position
+        glm::vec3 Position;
+        // normal
+        glm::vec3 Normal;
+        // texCoords
+        glm::vec2 TexCoords;
+        // tangent
+        glm::vec3 Tangent;
+        // bitangent
+        glm::vec3 Bitangent;
+        //bone indexes which will influence this vertex
+        int m_BoneIDs[MAX_BONE_INFLUENCE];
+        //weights from each bone
+        float m_Weights[MAX_BONE_INFLUENCE];
+    };
+
+    struct Texture {
+        unsigned int id;
+        string type;
+        string path;
+    };
+
+    class Mesh {
+    public:
+        // mesh Data
+        vector<Vertex>       vertices;
+        vector<unsigned int> indices;
+        vector<Texture>      textures;
+        unsigned int VAO;
+
+        // constructor
+        Mesh(vector<Vertex> vertices, vector<unsigned int> indices, vector<Texture> textures)
+        {
+            this->vertices = vertices;
+            this->indices = indices;
+            this->textures = textures;
+
+            // now that we have all the required data, set the vertex buffers and its attribute pointers.
+            setupMesh();
+        }
+
+        // render the mesh
+        void Draw(Shader& shader)
+        {
+            // bind appropriate textures
+            unsigned int diffuseNr = 1;
+            unsigned int specularNr = 1;
+            unsigned int normalNr = 1;
+            unsigned int heightNr = 1;
+            for (unsigned int i = 0; i < textures.size(); i++)
+            {
+                glActiveTexture(GL_TEXTURE0 + i); // active proper texture unit before binding
+                // retrieve texture number (the N in diffuse_textureN)
+                string number;
+                string name = textures[i].type;
+                if (name == "texture_diffuse")
+                    number = std::to_string(diffuseNr++);
+                else if (name == "texture_specular")
+                    number = std::to_string(specularNr++); // transfer unsigned int to string
+                else if (name == "texture_normal")
+                    number = std::to_string(normalNr++); // transfer unsigned int to string
+                else if (name == "texture_height")
+                    number = std::to_string(heightNr++); // transfer unsigned int to string
+
+                // now set the sampler to the correct texture unit
+                glUniform1i(glGetUniformLocation(shader.ID, (name + number).c_str()), i);
+                // and finally bind the texture
+                glBindTexture(GL_TEXTURE_2D, textures[i].id);
+            }
+
+            // draw mesh
+            glBindVertexArray(VAO);
+            glDrawElements(GL_TRIANGLES, static_cast<unsigned int>(indices.size()), GL_UNSIGNED_INT, 0);
+            glBindVertexArray(0);
+
+            // always good practice to set everything back to defaults once configured.
+            glActiveTexture(GL_TEXTURE0);
+        }
+
+        void DrawInstanced(const Shader& shader, unsigned int instanceCount) const
+        {
+            // 绑定适当的纹理
+            unsigned int diffuseNr = 1;
+            unsigned int specularNr = 1;
+            unsigned int normalNr = 1;
+            unsigned int heightNr = 1;
+            for (unsigned int i = 0; i < textures.size(); i++)
+            {
+                glActiveTexture(GL_TEXTURE0 + i); // 激活正确的纹理单元
+                // 获取纹理编号（N 在 diffuse_textureN 中）
+                string number;
+                string name = textures[i].type;
+                if (name == "texture_diffuse")
+                    number = std::to_string(diffuseNr++);
+                else if (name == "texture_specular")
+                    number = std::to_string(specularNr++); // 转换 unsigned int 到 string
+                else if (name == "texture_normal")
+                    number = std::to_string(normalNr++); // 转换 unsigned int 到 string
+                else if (name == "texture_height")
+                    number = std::to_string(heightNr++); // 转换 unsigned int 到 string
+
+                // 现在设置采样器到正确的纹理单元
+                glUniform1i(glGetUniformLocation(shader.ID, (name + number).c_str()), i);
+                // 绑定纹理
+                glBindTexture(GL_TEXTURE_2D, textures[i].id);
+            }
+
+            // 绑定顶点数组对象
+            glBindVertexArray(VAO);
+            // 执行实例化绘制
+            glDrawElementsInstanced(GL_TRIANGLES, static_cast<unsigned int>(indices.size()), GL_UNSIGNED_INT, 0, instanceCount);
+            // 解绑顶点数组对象
+            glBindVertexArray(0);
+
+            // 重置激活的纹理单元
+            glActiveTexture(GL_TEXTURE0);
+        }
+
+        void DrawInstancedSSBO(const Shader& shader, unsigned int instanceCount) const
+        {
+            // 1. 绑定纹理（与普通 Draw 相同）
+            unsigned int diffuseNr = 1;
+            unsigned int specularNr = 1;
+            unsigned int normalNr = 1;
+            unsigned int heightNr = 1;
+            for (unsigned int i = 0; i < textures.size(); i++)
+            {
+                glActiveTexture(GL_TEXTURE0 + i);
+                string number;
+                string name = textures[i].type;
+                if (name == "texture_diffuse")
+                    number = std::to_string(diffuseNr++);
+                else if (name == "texture_specular")
+                    number = std::to_string(specularNr++);
+                else if (name == "texture_normal")
+                    number = std::to_string(normalNr++);
+                else if (name == "texture_height")
+                    number = std::to_string(heightNr++);
+                glUniform1i(glGetUniformLocation(shader.ID, (name + number).c_str()), i);
+                glBindTexture(GL_TEXTURE_2D, textures[i].id);
+            }
+
+            // 2. 绑定VAO并实例化绘制
+            glBindVertexArray(VAO);
+
+            glDrawElementsInstanced(
+                GL_TRIANGLES,
+                static_cast<unsigned int>(indices.size()),
+                GL_UNSIGNED_INT,
+                0,
+                instanceCount 
+            );
+            glBindVertexArray(0);
+
+            // 3. 恢复纹理激活（可选）
+            glActiveTexture(GL_TEXTURE0);
+        }
+
+
+    private:
+        // render data 
+        unsigned int VBO, EBO;
+
+        // initializes all the buffer objects/arrays
+        void setupMesh()
+        {
+            // create buffers/arrays
+            glGenVertexArrays(1, &VAO);
+            glGenBuffers(1, &VBO);
+            glGenBuffers(1, &EBO);
+
+            glBindVertexArray(VAO);
+            // load data into vertex buffers
+            glBindBuffer(GL_ARRAY_BUFFER, VBO);
+            // A great thing about structs is that their memory layout is sequential for all its items.
+            // The effect is that we can simply pass a pointer to the struct and it translates perfectly to a glm::vec3/2 array which
+            // again translates to 3/2 floats which translates to a byte array.
+            glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), &vertices[0], GL_STATIC_DRAW);
+
+            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+            glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), &indices[0], GL_STATIC_DRAW);
+
+            // set the vertex attribute pointers
+            // vertex Positions
+            glEnableVertexAttribArray(0);
+            glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0);
+            // vertex normals
+            glEnableVertexAttribArray(1);
+            glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, Normal));
+            // vertex texture coords
+            glEnableVertexAttribArray(2);
+            glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, TexCoords));
+            // vertex tangent
+            glEnableVertexAttribArray(3);
+            glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, Tangent));
+            // vertex bitangent
+            glEnableVertexAttribArray(4);
+            glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, Bitangent));
+            // ids
+            glEnableVertexAttribArray(5);
+            glVertexAttribIPointer(5, 4, GL_INT, sizeof(Vertex), (void*)offsetof(Vertex, m_BoneIDs));
+
+            // weights
+            glEnableVertexAttribArray(6);
+            glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, m_Weights));
+            glBindVertexArray(0);
+        }
+    };
+}
+#endif

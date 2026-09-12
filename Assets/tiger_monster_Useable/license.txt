@@ -1,0 +1,11 @@
+Model Information:
+* title:	tiger monster - animated
+* source:	https://sketchfab.com/3d-models/tiger-monster-animated-832a54d3ba134e1ca2d60d035a06b3e7
+* author:	nolanfa (https://sketchfab.com/nolanfa)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "tiger monster - animated" (https://sketchfab.com/3d-models/tiger-monster-animated-832a54d3ba134e1ca2d60d035a06b3e7) by nolanfa (https://sketchfab.com/nolanfa) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)

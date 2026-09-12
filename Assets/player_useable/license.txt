@@ -1,0 +1,11 @@
+Model Information:
+* title:	Minecraft Doey the doughman
+* source:	https://sketchfab.com/3d-models/minecraft-doey-the-doughman-ab81cb07eee84702b678dcfeeba4257b
+* author:	Chikygames (https://sketchfab.com/Chikygames)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Minecraft Doey the doughman" (https://sketchfab.com/3d-models/minecraft-doey-the-doughman-ab81cb07eee84702b678dcfeeba4257b) by Chikygames (https://sketchfab.com/Chikygames) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)

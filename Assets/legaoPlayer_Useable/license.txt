@@ -1,0 +1,11 @@
+Model Information:
+* title:	Mehmetcik-Turkish blue beret
+* source:	https://sketchfab.com/3d-models/mehmetcik-turkish-blue-beret-1ea929386e704086b8cb99317c268e27
+* author:	District24 (https://sketchfab.com/mahmutyaz)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Mehmetcik-Turkish blue beret" (https://sketchfab.com/3d-models/mehmetcik-turkish-blue-beret-1ea929386e704086b8cb99317c268e27) by District24 (https://sketchfab.com/mahmutyaz) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
